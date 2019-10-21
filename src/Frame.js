@@ -2,12 +2,13 @@ import React , {useState , useEffect } from 'react';
 import './common.css'
 import Device from './Device';
 import {Row , Col , Container , Button , Form} from 'react-bootstrap';
-import Model from './Model'
+import Model from './Model';
+import axios from 'axios'
 function Frame(props) {
     var deviceList = [
         { id :1,
           wifi : false,
-          charge : true,
+          charge : false,
           colorClass : 0,
           status : "idle"
         } , 
@@ -45,6 +46,20 @@ function Frame(props) {
     ];
     var [deviceListState , setDeviceListState] = useState(deviceList);
     var [train , setTrain] = useState(false);
+    //prediction
+    var [text , setText] = useState('');
+    var [senti , setSenti] = useState(-1); 
+     
+    function getPrediction(){
+         axios.get('http://127.0.0.1:5000/query' , {
+           params : {
+             text : text
+           }
+         }).then(res=>{
+           console.log(res);
+         })
+    }
+
 
     function startTraining(e){
        setTrain(true);
@@ -72,12 +87,18 @@ function Frame(props) {
                 <Form>
                   <Form.Group controlId="exampleForm.ControlInput1">
                     <Form.Label>Query for Sentiment Analysis</Form.Label>
-                    <Form.Control type="text" placeholder="Some Text" />
+                    <Form.Control type="text" value={text} placeholder="Some Text" onChange={e=>{setText(e.target.value)}}/>
                   </Form.Group>
                 </Form>
                </Col>
                <Col lg={4}>
+               <Row>
                <Button variant="success" onClick={startTraining}>Train</Button>
+               </Row>
+               <Row>
+               <Button variant="success" onClick={getPrediction}>Predict</Button>
+               </Row>
+
                </Col>
              </Row>
              
